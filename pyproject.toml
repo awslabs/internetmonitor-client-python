@@ -1,0 +1,192 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "amzn-internetmonitor-client-python"
+version = "1.0"
+readme = "README.md"
+dependencies = [
+   "boto3 ~= 1.35.60",
+]
+requires-python = ">=3.11"
+
+[tool.hatch.build]
+directory = "./build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/internetmonitor_client"]
+
+[tool.hatch.env]
+# This is for lockfile support for environments which are automatically updated by Updatabot
+# To enable the functionality, simply run:
+#    brazil-build && git add requirements.txt requirements
+requires = [ "hatch-pip-compile" ]
+
+[tool.hatch.envs.default]
+# This controls what version of Python you want to be the default
+# when running any scripts or tools to do things like debug test failures
+# or do general development.  It's lockfile is ./requirements.txt
+python = "3.12"
+
+# These are the shared dependencies across all environments that aren't
+# detached
+dependencies = [
+  "boto3",
+  "coverage[toml]",
+  "pytest",
+  "moto",
+  "mypy",
+]
+type = "pip-compile"
+pip-compile-args = ["--no-emit-index-url", "--no-emit-trusted-host"]
+
+[tool.hatch.envs.default.scripts]
+# These are scripts you can run using `brazil-build run <script-name>`
+typing = [
+  "mkdir -p .mypy_cache",
+  "mypy --install-types --non-interactive src/internetmonitor_client tests"
+]
+cov_erase = "coverage erase"
+cov_report = [
+  "- coverage combine",
+  "coverage report",
+  "coverage html",
+  "coverage xml",
+]
+
+# These are the commands run when `brazil-build release` is called
+release = [
+  "hatch run lint:check", # This is a separate environment, so needs to be called as a full subprocess
+  "typing",
+  "cov_erase",
+  "hatch run test:cov", # This does matrix testing across python multiple python versions, but the command is only run from one
+  "cov_report",
+]
+# This command is for updating all your lock files across all
+update = [
+  "hatch-pip-compile --upgrade --all"
+]
+
+[tool.mypy]
+show_error_codes = true
+pretty = true
+ignore_missing_imports = true
+files = [ "src/**/*.py" ]
+
+[tool.hatch.envs.test.scripts]
+cov = "coverage run -m pytest {args:tests}"
+
+[[tool.hatch.envs.test.matrix]]
+# This defines multiple variables you can generate combinations
+# to test underneath different environments.  A separate environment and
+# lock file will be created for every combination located in `./requirements/`
+python = ["3.11", "3.12"]
+
+## Linter detached environment using Ruff
+
+[tool.hatch.envs.lint]
+detached = true
+skip-install = true
+dependencies = [
+  "ruff",
+]
+type = "pip-compile"
+pip-compile-args = ["--no-emit-index-url", "--no-emit-trusted-host"]
+
+[tool.hatch.envs.lint.scripts]
+check = "ruff {args:src tests}"
+fmt = [
+  "ruff --fix {args:src tests}",
+  "check",
+]
+
+
+## This environment is used solely to generate a lock file on hatch,
+# and hatch-pip-compile that can be automatically updated
+[tool.hatch.envs.build-tools]
+# This version states what version your build tools build with.  To change it,
+# you will need to:
+# * Update the `build.sh` to match,
+# * Remove the `requirements/requirements-build-tools.txt` file
+# * Run `brazil-build run update` to generate a new lock file for the environment
+python = "3.12"
+detached = true
+skip-install = true
+dependencies = [
+  "hatch",
+  "hatch-pip-compile",
+]
+type = "pip-compile"
+pip-compile-args = ["--no-emit-index-url", "--no-emit-trusted-host"]
+
+## Pytest and Coverage default options
+
+[tool.pytest.ini_options]
+addopts = [
+    "--durations=5",
+    "--color=yes",
+]
+testpaths = [ "tests" ]
+
+[tool.coverage.run]
+source_pkgs = ["internetmonitor_client"]
+branch = true
+parallel = true
+fail_under = 90
+
+[tool.coverage.paths]
+"internetmonitor_client" = ["src/internetmonitor_client", "**/site-packages/internetmonitor_client"]
+
+[tool.coverage.report]
+exclude_lines = [
+  "no cov",
+  "if __name__ == .__main__.:",
+  "if TYPE_CHECKING:",
+]
+show_missing = true
+
+[tool.coverage.xml]
+output = "build/brazil-documentation/coverage/coverage.xml"
+
+[tool.coverage.html]
+directory = "build/brazil-documentation/coverage/"
+
+[tool.ruff]
+target-version = "py311"
+line-length = 120
+
+[tool.ruff.lint]
+select = [
+  "A",
+  "ARG",
+  "B",
+  "C",
+  "DTZ",
+  "E",
+  "EM",
+  "F",
+  "FBT",
+  "I",
+  "ICN",
+  "ISC",
+  "N",
+  "PLC",
+  "PLE",
+  "PLR",
+  "PLW",
+  "Q",
+  "RUF",
+  "S",
+  "T",
+  "TID",
+  "UP",
+  "W",
+  "YTT",
+]
+
+isort.known-first-party = ["internetmonitor_client"]
+
+[tool.ruff.lint.per-file-ignores]
+# Tests can use magic values, assertions, and relative imports
+"tests/**/*" = ["PLR2004", "S101", "TID252"]

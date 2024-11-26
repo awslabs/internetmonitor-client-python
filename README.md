@@ -1,4 +1,4 @@
-## Amazon CloudWatch Internet Monitor Client Library Python
+## Amazon CloudWatch Internet Monitor Client Library for Python
 
 A high-level client representing Amazon CloudWatch Internet Monitor.
 
