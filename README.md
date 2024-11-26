@@ -1,4 +1,4 @@
-## CWIMClientPython
+## Amazon CloudWatch Internet Monitor Client Library Python
 
 A high-level client representing Amazon CloudWatch Internet Monitor.
 

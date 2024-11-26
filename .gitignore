@@ -1,0 +1,9 @@
+*.egg-info/
+__pycache__/
+.coverage
+.hatch_venv
+.ruff_cache
+.pytest_cache
+.mypy_cache
+.venv
+/htmlcov
