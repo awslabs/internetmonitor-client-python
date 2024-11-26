@@ -1,7 +1,6 @@
 from unittest.mock import MagicMock, patch
 
 import pytest
-
 from internetmonitor_client import CloudWatchInternetMonitorClient
 
 
@@ -13,12 +12,8 @@ class TestCloudWatchInternetMonitorClient:
 
     def test_get_routing_suggestions(self, mock_client):
         mock_client.return_value = self.mock_internetmonitor
-        self.mock_internetmonitor.start_query.return_value = {
-            "QueryId": "test-query-id"
-        }
-        self.mock_internetmonitor.get_query_status.return_value = {
-            "Status": "SUCCEEDED"
-        }
+        self.mock_internetmonitor.start_query.return_value = {"QueryId": "test-query-id"}
+        self.mock_internetmonitor.get_query_status.return_value = {"Status": "SUCCEEDED"}
         self.mock_internetmonitor.get_query_results.return_value = {
             "Fields": [
                 {"Name": "dns_resolver_asn", "Type": "integer"},
@@ -31,9 +26,7 @@ class TestCloudWatchInternetMonitorClient:
             ],
         }
 
-        client = CloudWatchInternetMonitorClient(
-            self.monitor_name, region_name="us-west-2"
-        )
+        client = CloudWatchInternetMonitorClient(self.monitor_name, region_name="us-west-2")
 
         routing_suggestions = list(client.get_routing_suggestions())
         assert isinstance(routing_suggestions, list)
@@ -47,12 +40,8 @@ class TestCloudWatchInternetMonitorClient:
 
     def test_get_top_locations(self, mock_client):
         mock_client.return_value = self.mock_internetmonitor
-        self.mock_internetmonitor.start_query.return_value = {
-            "QueryId": "test-query-id"
-        }
-        self.mock_internetmonitor.get_query_status.return_value = {
-            "Status": "SUCCEEDED"
-        }
+        self.mock_internetmonitor.start_query.return_value = {"QueryId": "test-query-id"}
+        self.mock_internetmonitor.get_query_status.return_value = {"Status": "SUCCEEDED"}
         self.mock_internetmonitor.get_query_results.return_value = {
             "Fields": [
                 {"Name": "asn", "Type": "integer"},
@@ -88,12 +77,8 @@ class TestCloudWatchInternetMonitorClient:
 
     def test_get_overall_traffic_suggestions(self, mock_client):
         mock_client.return_value = self.mock_internetmonitor
-        self.mock_internetmonitor.start_query.return_value = {
-            "QueryId": "test-query-id"
-        }
-        self.mock_internetmonitor.get_query_status.return_value = {
-            "Status": "SUCCEEDED"
-        }
+        self.mock_internetmonitor.start_query.return_value = {"QueryId": "test-query-id"}
+        self.mock_internetmonitor.get_query_status.return_value = {"Status": "SUCCEEDED"}
         self.mock_internetmonitor.get_query_results.return_value = {
             "Fields": [
                 {"Name": "current_aws_location", "Type": "string"},
@@ -110,12 +95,8 @@ class TestCloudWatchInternetMonitorClient:
 
     def test_get_overall_traffic_suggestions_details(self, mock_client):
         mock_client.return_value = self.mock_internetmonitor
-        self.mock_internetmonitor.start_query.return_value = {
-            "QueryId": "test-query-id"
-        }
-        self.mock_internetmonitor.get_query_status.return_value = {
-            "Status": "SUCCEEDED"
-        }
+        self.mock_internetmonitor.start_query.return_value = {"QueryId": "test-query-id"}
+        self.mock_internetmonitor.get_query_status.return_value = {"Status": "SUCCEEDED"}
         self.mock_internetmonitor.get_query_results.return_value = {
             "Fields": [
                 {"Name": "city", "Type": "string"},
@@ -159,7 +140,5 @@ class TestCloudWatchInternetMonitorClient:
 
         client.internetmonitor.get_query_status.side_effect = mock_get_query_status
 
-        with pytest.raises(
-            Exception, match="Unable to get query status after 1 retries"
-        ):
+        with pytest.raises(Exception, match="Unable to get query status after 1 retries"):
             list(client.get_measurements())
