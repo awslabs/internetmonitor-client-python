@@ -7,7 +7,7 @@ A high-level client representing Amazon CloudWatch Internet Monitor.
 * **Minimum requirements** -- Python 3.11 (or later) and pip
 * **Download** -- Download the latest preview release or pick it up from pip:
 ```
-pip install amzn-internetmonitor-client-python
+pip install internetmonitor-client-python
 ```
 
 ## Using the CloudWatch Internet Monitor Client
